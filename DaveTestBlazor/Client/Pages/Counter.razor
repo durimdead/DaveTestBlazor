@@ -1,18 +1,36 @@
-﻿@page "/counter"
+﻿@page "/candidateinfo"
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Candidate Information</PageTitle>
 
-<h1>Counter</h1>
+<h1>David Lancellotti</h1>
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <img src="Content\DaveImage.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <a class="link-info" href="https://www.linkedin.com/in/david-lancellotti-11674384/">LinkedIn Profile</a><br />
+                        <a class="link-info" href="https://github.com/durimdead">GitHub content (not much here!)</a><br />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/wDtTwWiV3jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

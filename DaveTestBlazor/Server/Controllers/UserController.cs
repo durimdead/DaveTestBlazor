@@ -33,7 +33,15 @@ namespace DaveTestBlazor.Server.Controllers
         [HttpGet("{userID}")]
         public User Get(int userID)
         {
-            return _userService.GetUserByID(userID);
+            // in the case that we are getting a "new" user to add.
+            User returnValue = new User(0, "", "", "", "", 0);
+
+            // if this is an existing user
+            if (userID > 0)
+            {
+                returnValue = _userService.GetUserByID(userID);
+            }
+            return returnValue;
         }
 
         // POST api/<UserListingController>

@@ -5,11 +5,17 @@
 <PageTitle>User Listing</PageTitle>
 <h2>User Listing</h2>
 
-@if (Users == null && UserToEdit.UserID == 0)
+@if (Users != null){
+    // this means that we at least have an empty list - something was loaded. Show the "create user" button
+    <button class="btn btn-success" type="button" @onclick="@(e => GetUserToEdit(0))">Create User</button>
+}
+
+@if (Users == null && UserToEdit.UserID < 0)
 {
+    // both objects are null, something is loading!
     <p><em>Loading...</em></p>
 }
-else if (UserToEdit.UserID > 0)
+else if (UserToEdit.UserID >= 0)
 {
     var currentUserID = UserToEdit.UserID;
     <EditForm Model=@UserToEdit OnSubmit="(e => FormSubmitted(UserToEdit))">
@@ -50,43 +56,25 @@ else if (UserToEdit.UserID > 0)
                     </div>
                 </div>
             </div>
-            <br/>
+            <br />
             <div class="row">
                 <div class="col-12">
                     <input type="submit" class="btn btn-primary" value="Save" />
                     <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
-                    <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
+                    @if (currentUserID > 0)
+                    {
+                        // only show the "delete" button if we already have a userID
+                        <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
+                    }
                 </div>
             </div>
         </div>
-        
+
     </EditForm>
-
-
-
-   @* var currentUserID = UserToEdit.UserID;
-    <div class="container-lg container-md container-sm">
-        <div class="row">
-            <div class="col-12">
-                <input type="text" placeholder="Name" value="@UserToEdit.FirstName">
-                <input type="text" placeholder="Name" value="@UserToEdit.LastName">
-                <input type="text" placeholder="Name" value="@UserToEdit.Address">
-                <input type="text" placeholder="Name" value="@UserToEdit.Age">
-                <input type="text" placeholder="Name" value="@UserToEdit.PhoneNumber">
-                <input type="hidden" value="@UserToEdit.UserID">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <button class="btn btn-success" type="submit">Save</button>
-                <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
-                <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
-            </div>
-        </div>
-    </div>*@
 }
-else
+else if (Users.Count() > 0)
 {
+    // we have at least one user - show the table
     <table class="table">
         <thead>
             <tr>
@@ -115,6 +103,10 @@ else
             }
         </tbody>
     </table>
+}
+else if (Users.Count() == 0)
+{
+    <h3>No users found in database. Please create some!</h3>
 }
 
 @code {
@@ -170,6 +162,7 @@ else
         }
     }
 
+    // form submit for new user / user update
     private async Task FormSubmitted(User UserToSubmit)
     {
         Console.WriteLine("About to submit " + UserToEdit.UserID);

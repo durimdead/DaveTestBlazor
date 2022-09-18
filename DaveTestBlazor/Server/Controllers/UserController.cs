@@ -1,6 +1,6 @@
 ﻿using DaveTestBlazor.Server.Repositories;
 using DaveTestBlazor.Server.Services.Interfaces;
-using DaveTestBlazor.Shared.Models;
+using DaveTestBlazor.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DaveTestBlazor.Server.Controllers

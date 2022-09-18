@@ -1,5 +1,4 @@
 ﻿using DaveTestBlazor.Shared;
-using DaveTestBlazor.Shared.Models;
 
 namespace DaveTestBlazor.Server.Services.Interfaces
 {

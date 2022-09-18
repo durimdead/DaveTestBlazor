@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DaveTestBlazor.Shared.Models
+namespace DaveTestBlazor.Shared
 {
     public class User
     {

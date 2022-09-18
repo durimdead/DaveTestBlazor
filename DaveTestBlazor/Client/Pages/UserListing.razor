@@ -1,4 +1,4 @@
-﻿@page "/userlisting"
+﻿@*@page "/userlisting"
 @using DaveTestBlazor.Shared
 @inject HttpClient Http
 
@@ -12,12 +12,12 @@
     {
         try
         {
-            var users = Http.GetFromJsonAsync<User[]>("api/UserListing");
-
+            var users = Http.GetFromJsonAsync<User[]>("api/User");
+            Users = users.Result;
         }
         catch (Exception e)
         {
             Console.Write(e.Message);
         }
     }
-}
+}*@

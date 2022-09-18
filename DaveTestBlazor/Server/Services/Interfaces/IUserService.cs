@@ -27,6 +27,6 @@ namespace DaveTestBlazor.Server.Services.Interfaces
         /// gets all users and their information
         /// </summary>
         /// <returns>A list of all currently active users.</returns>
-        public List<User> GetAllUsers();
+        public IEnumerable<User> GetAllUsers();
     }
 }

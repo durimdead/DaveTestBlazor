@@ -65,7 +65,7 @@ namespace DaveTestBlazor.Server.Services
         /// gets all users and their information
         /// </summary>
         /// <returns>A list of all users.</returns>
-        public List<User> GetAllUsers()
+        public IEnumerable<User> GetAllUsers()
         {
             List<User> returnValue = new List<User>();
             try

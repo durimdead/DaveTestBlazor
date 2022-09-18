@@ -10,19 +10,29 @@ namespace DaveTestBlazor.Shared
     {
         public User(int userID, string firstName, string lastName, string address, string phoneNumber, int age)
         {
-            this.userID = userID;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.address = address;
-            this.phoneNumber = phoneNumber;
-            this.age = age;
+            this.UserID = userID;
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.Address = address;
+            this.PhoneNumber = phoneNumber;
+            this.Age = age;
         }
 
-        public int userID { get; set; }
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public string address { get; set; }
-        public string phoneNumber { get; set; }
-        public int age { get; set; }
+        public User()
+        {
+            this.UserID = 0;
+            this.FirstName = String.Empty;
+            this.LastName = String.Empty;
+            this.Address = String.Empty;
+            this.PhoneNumber = String.Empty;
+            this.Age = 0;
+        }
+
+        public int UserID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+        public string PhoneNumber { get; set; }
+        public int Age { get; set; }
     }
 }

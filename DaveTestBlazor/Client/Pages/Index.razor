@@ -5,11 +5,79 @@
 <PageTitle>User Listing</PageTitle>
 <h2>User Listing</h2>
 
-@code{
-    private User[]? Users;
+@if (Users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Users)
+            {
+                <tr>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary" data-userid="@user.UserID" onclick="console.log('clicked user : @user.UserID')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                            </svg>&nbsp;&nbsp;@user.FirstName @user.LastName
+                        </button>
+                    </td>
+                    <td>@user.Age</td>
+                    <td>@user.Address</td>
+                    <td>@user.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@*<Modal @ref="modal" Title="Modal title">
+    <BodyTemplate>
+        Modal body text goes here.
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+        <Button Color="ButtonColor.Primary">Save changes</Button>
+    </FooterTemplate>
+</Modal>*@
+
+@code {
+    private List<User> Users;
+    private User UserToEdit = new User();
 
     protected override async Task OnInitializedAsync()
     {
-        Users = await Http.GetFromJsonAsync<User[]>("User");
+        try
+        {
+            Users = await Http.GetFromJsonAsync<List<User>>("api/User");
+        }
+        catch (Exception e)
+        {
+            // is this perfect? no; however, letting the application swallow your errors is worse.
+            Console.Write(e.Message);
+        }
     }
+
+    private async Task GetUserToEdit(int userID){
+        UserToEdit = await Http.GetFromJsonAsync<User>("api/User/" + userID);
+    }
+
+//    private Modal modal;
+//    private async Task OnShowModalClick()
+//    {
+//        await modal?.ShowAsync();
+//    }
+//    private async Task OnHideModalClick()
+//    {
+//        await modal?.HideAsync();
+//    }
 }

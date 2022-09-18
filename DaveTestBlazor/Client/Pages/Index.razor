@@ -3,7 +3,19 @@
 @inject HttpClient Http
 
 <PageTitle>User Listing</PageTitle>
-<h2>User Listing</h2>
+@if (UserToEdit.UserID > 0)
+{
+    <h2>Edit User</h2>
+}
+else if (UserToEdit.UserID == 0)
+{
+    <h2>Add User</h2>
+}
+else
+{
+    <h2>User Listing</h2>
+}
+
 
 @if (Users != null){
     // this means that we at least have an empty list - something was loaded. Show the "create user" button

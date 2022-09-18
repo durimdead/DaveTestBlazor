@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\CreateDatabase.sql" />
-    <None Include="Scripts\TemporalTableDelete.sql" />
+    <None Include="Scripts\TemporalTableOperationSamples.sql" />
     <None Include="Scripts\CreateDatabase_Experimental.sql" />
   </ItemGroup>
 </Project>

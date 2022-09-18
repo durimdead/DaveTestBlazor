@@ -40,7 +40,7 @@ namespace DaveTestBlazor.Server.Controllers
         [HttpPost]
         public void Post([FromBody]User userToSave)
         {
-            Console.WriteLine("In Here");
+            _userService.UpsertUser(userToSave.FirstName, userToSave.LastName, userToSave.Address, userToSave.PhoneNumber, userToSave.Age, userToSave.UserID);
         }
 
         // PUT api/<UserListingController>/5

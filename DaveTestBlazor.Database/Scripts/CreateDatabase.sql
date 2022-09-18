@@ -389,7 +389,7 @@ SELECT
     ,[PhoneNumber]
 FROM
     [dbo].[User]
-    
+GO    
 
 
 /************************************************************************
@@ -408,6 +408,8 @@ FROM
 *
 *
 ************************************************************************/
+USE [DaveTest]
+GO
 exec [dbo].usp_UserUpsert 0, N'David', N'Lancellotti', N'2 Emerald Lane, Somewheresville, NJ 01010', N'87', N'1-800-123-1234'
 exec [dbo].usp_UserUpsert 0, N'Tod', N'Wilkinson', N'1 Happy Street, Middlington, TN 43435', N'45', N'1-201-565-6574'
 exec [dbo].usp_UserUpsert 0, N'Michelle', N'Aaronson', N'2 Emerald Lane, Elsingwhere, CA 43245', N'33', N'1-545-133-4178'

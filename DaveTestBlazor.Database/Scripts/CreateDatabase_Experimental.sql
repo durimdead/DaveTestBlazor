@@ -13,9 +13,9 @@ GO
 CREATE DATABASE [DaveTest_Complex]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'DaveTest', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DaveTest.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'DaveTest_Complex', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DaveTest_Complex.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'DaveTest_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DaveTest_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'DaveTest_Complex_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\DaveTest_Complex_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT
 GO
 
@@ -140,13 +140,6 @@ GO
 *
 ************************************************************************/
 
-
--- create the user in the application db and then tie it to the account created on the server
-USE [DaveTest_Complex]
-GO
-CREATE USER [DaveTestAccount] FOR LOGIN [DaveTestAccount] WITH DEFAULT_SCHEMA=[dbo]
-GO
-
 -- create the user in the application db and then tie it to the account created on the server
 -- also, add them to the appropriate roles
 USE [DaveTest_Complex]
@@ -192,7 +185,7 @@ CREATE TABLE [dbo].[User](
     ,[ValidTo] datetime2 GENERATED ALWAYS AS ROW END
     ,PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[User]));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[UserAudit]));
 GO
 
 -- UserAddress
@@ -201,12 +194,12 @@ CREATE TABLE [dbo].[UserAddress](
     ,UserID INT NOT NULL
     ,FullAddress VARCHAR(500) NOT NULL
     ,CONSTRAINT [PK_UserAddressID] PRIMARY KEY CLUSTERED
-    ([AddressID] ASC) 
+    ([UserAddressID] ASC) 
     ,[ValidFrom] datetime2 GENERATED ALWAYS AS ROW START
     ,[ValidTo] datetime2 GENERATED ALWAYS AS ROW END
     ,PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[UserAddress]));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[UserAddressAudit]));
 GO
 
 -- FKs for UserAddress table
@@ -227,7 +220,7 @@ CREATE TABLE [dbo].[UserPhone](
     ,[ValidTo] datetime2 GENERATED ALWAYS AS ROW END
     ,PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[UserPhone]));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[UserPhoneAudit]));
 GO
 
 -- FKs for UserAddress table
@@ -309,23 +302,21 @@ BEGIN TRY
             SET
                 [FirstName] = @userFirstName
                 ,[LastName] = @userLastName
-                ,[Address] = @userAddress
                 ,[Age] = @userAge
-                ,[PhoneNumber] = @userPhoneNumber
             WHERE
                 [UserID] = @userID
                 
             -- Update the User Address table
             UPDATE [dbo].[UserAddress]
             SET
-                [Address] = @userAddress
+                FullAddress = @userAddress
             WHERE
                 [UserID] = @userID
                 
             -- Update User's Phone number
             UPDATE [dbo].[UserPhone]
             SET
-                [UserPhone] = @userPhoneNumber
+                [PhoneNumber] = @userPhoneNumber
             WHERE
                 [UserID] = @userID
         END;
@@ -348,7 +339,7 @@ BEGIN TRY
 
             -- create new user address
             INSERT INTO [dbo].[UserAddress](
-                [UserAddress]
+                [FullAddress]
                 ,[UserID]
             )
             VALUES(
@@ -358,7 +349,7 @@ BEGIN TRY
 
             -- create new user
             INSERT INTO [dbo].[UserPhone](
-                [UserPhone]
+                [PhoneNumber]
                 ,[UserID]
             )
             VALUES(
@@ -472,14 +463,14 @@ SELECT
     u.[UserID]
     ,u.[FirstName]
     ,u.[LastName]
-    ,ua.[Address]
+    ,ua.[FullAddress] AS [Address]
     ,u.[Age]
     ,up.[PhoneNumber]
 FROM
     [dbo].[User] u
         JOIN [dbo].[UserAddress] ua ON u.[UserID] = ua.[UserID]
         JOIN [dbo].[UserPhone] up ON u.[UserID] = up.[UserID]
-    
+GO
 
 
 /************************************************************************

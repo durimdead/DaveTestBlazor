@@ -147,6 +147,19 @@ GO
 CREATE USER [DaveTestAccount] FOR LOGIN [DaveTestAccount] WITH DEFAULT_SCHEMA=[dbo]
 GO
 
+-- create the user in the application db and then tie it to the account created on the server
+-- also, add them to the appropriate roles
+USE [DaveTest_Complex]
+GO
+CREATE USER [DaveTestAccount] FOR LOGIN [DaveTestAccount] WITH DEFAULT_SCHEMA=[dbo]
+ALTER ROLE [db_datareader] add member [DaveTestAccount];
+ALTER ROLE [db_datawriter] add member [DaveTestAccount];
+GO
+
+-- grant execute permissions for Sprocs
+GRANT EXECUTE TO [DaveTestAccount]
+GO
+
 /************************************************************************
 *		#########################################################
 *			
@@ -182,28 +195,11 @@ CREATE TABLE [dbo].[User](
 WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[User]));
 GO
 
-
-
--- Address
-CREATE TABLE [dbo].[Address](
-    AddressID INT IDENTITY(1,1) NOT NULL
-    ,FullAddress VARCHAR(300) NOT NULL
-    ,CONSTRAINT [PK_AddressID] PRIMARY KEY CLUSTERED
-    ([AddressID] ASC) 
-    ,[ValidFrom] datetime2 GENERATED ALWAYS AS ROW START
-    ,[ValidTo] datetime2 GENERATED ALWAYS AS ROW END
-    ,PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
-)
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[Address]));
-GO
-
-
-
 -- UserAddress
 CREATE TABLE [dbo].[UserAddress](
     UserAddressID INT IDENTITY(1,1) NOT NULL
     ,UserID INT NOT NULL
-    ,AddressID INT NOT NULL
+    ,FullAddress VARCHAR(500) NOT NULL
     ,CONSTRAINT [PK_UserAddressID] PRIMARY KEY CLUSTERED
     ([AddressID] ASC) 
     ,[ValidFrom] datetime2 GENERATED ALWAYS AS ROW START
@@ -220,13 +216,26 @@ GO
 ALTER TABLE [dbo].[UserAddress] CHECK CONSTRAINT [FK_User_UserAddress_UserID]
 GO
 
-ALTER TABLE [dbo].[UserAddress]  WITH CHECK ADD  CONSTRAINT [FK_Address_UserAddress_AddressID] FOREIGN KEY([AddressID])
-REFERENCES [dbo].[Address] ([AddressID])
-GO
-ALTER TABLE [dbo].[UserAddress] CHECK CONSTRAINT [FK_Address_UserAddress_AddressID]
+-- UserPhone
+CREATE TABLE [dbo].[UserPhone](
+    UserPhoneID INT IDENTITY(1,1) NOT NULL
+    ,UserID INT NOT NULL
+    ,PhoneNumber VARCHAR(20) NOT NULL
+    ,CONSTRAINT [PK_UserPhoneID] PRIMARY KEY CLUSTERED
+    ([UserPhoneID] ASC) 
+    ,[ValidFrom] datetime2 GENERATED ALWAYS AS ROW START
+    ,[ValidTo] datetime2 GENERATED ALWAYS AS ROW END
+    ,PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [audit].[UserPhone]));
 GO
 
-
+-- FKs for UserAddress table
+ALTER TABLE [dbo].[UserPhone]  WITH CHECK ADD  CONSTRAINT [FK_User_UserPhone_UserID] FOREIGN KEY([UserID])
+REFERENCES [dbo].[User] ([UserID])
+GO
+ALTER TABLE [dbo].[UserPhone] CHECK CONSTRAINT [FK_User_UserPhone_UserID]
+GO
 
 
 
@@ -245,11 +254,195 @@ GO
 /************************************************************************
 *
 *
-*			BEGIN stored procedures
+*			BEGIN stored procedures -- template gotten from : https://stackoverflow.com/questions/2073737/nested-stored-procedures-containing-try-catch-rollback-pattern/2074139#2074139
 *
 *
 ************************************************************************/
+USE [DaveTest_Complex]
+GO
+/*
+===========================================================================================================================================
+=    Author:
+=        David Lancellotti
+=
+=    Create date: 
+=        09/18/2022 16:06 PM
+=
+=    Description:
+=        Update or insert a user record with the relevant information
+=
+=    UPDATES:
+=                                DateTime
+=    Author                        mm/dd/yyyy HH:mm    Description
+=    =====================        =============        =======================================================================================
+=
+=
+===========================================================================================================================================
+*/
+CREATE PROCEDURE [dbo].[usp_UserUpsert]
+    @userID AS INTEGER
+    ,@userFirstName AS VARCHAR(50)
+    ,@userLastName AS VARCHAR(50)
+    ,@userAddress AS VARCHAR(500)
+    ,@userAge AS INTEGER
+    ,@userPhoneNumber AS VARCHAR(20)
+AS
+SET XACT_ABORT, NOCOUNT ON
+DECLARE @starttrancount int
+BEGIN TRY
+    SELECT @starttrancount = @@TRANCOUNT
 
+    IF @starttrancount = 0
+        BEGIN TRANSACTION
+
+        -- trim our varchar inputs to ensure we have no whitespace
+        SET @userFirstName = LTRIM(RTRIM(@userFirstName));
+        SET @userLastName = LTRIM(RTRIM(@userLastName));
+        SET @userAddress = LTRIM(RTRIM(@userAddress));
+        SET @userPhoneNumber = LTRIM(RTRIM(@userPhoneNumber));
+
+        -- if we can find a record with the userID pushed in, let's update the information for it
+        IF EXISTS(SELECT 1 FROM [dbo].[User] WHERE [UserID] = @userID)
+        BEGIN;
+            -- Update Main User Table
+            UPDATE [dbo].[User]
+            SET
+                [FirstName] = @userFirstName
+                ,[LastName] = @userLastName
+                ,[Address] = @userAddress
+                ,[Age] = @userAge
+                ,[PhoneNumber] = @userPhoneNumber
+            WHERE
+                [UserID] = @userID
+                
+            -- Update the User Address table
+            UPDATE [dbo].[UserAddress]
+            SET
+                [Address] = @userAddress
+            WHERE
+                [UserID] = @userID
+                
+            -- Update User's Phone number
+            UPDATE [dbo].[UserPhone]
+            SET
+                [UserPhone] = @userPhoneNumber
+            WHERE
+                [UserID] = @userID
+        END;
+        -- else, we check to see if the userID sent in is 0 - indicating a new user
+        ELSE IF (@userID = 0)
+        BEGIN;
+            -- create new user
+            INSERT INTO [dbo].[User](
+                [FirstName]
+                ,[LastName]
+                ,[Age]
+            )
+            VALUES(
+                @userFirstName
+                ,@userLastName
+                ,@userAge
+            );
+            -- grab the value just added as the newest Identity for the user table
+            DECLARE @newUserID INT = @@IDENTITY;
+
+            -- create new user address
+            INSERT INTO [dbo].[UserAddress](
+                [UserAddress]
+                ,[UserID]
+            )
+            VALUES(
+                @userAddress
+                ,@newUserID
+            );
+
+            -- create new user
+            INSERT INTO [dbo].[UserPhone](
+                [UserPhone]
+                ,[UserID]
+            )
+            VALUES(
+                @userPhoneNumber
+                ,@newUserID
+            );
+
+        END;
+        -- if the ID doesn't exists and is not 0, the user doesn't exist and we can't update it.
+        ELSE
+        BEGIN;
+            THROW 51001, 'The UserID does not exist', 1;
+        END;
+
+    IF @starttrancount = 0 
+        COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 AND @starttrancount = 0 
+        ROLLBACK TRANSACTION;
+    THROW;
+END CATCH
+GO
+
+
+/*
+===========================================================================================================================================
+=    Author:
+=        David Lancellotti
+=
+=    Create date: 
+=        09/17/2022 14:06 PM
+=
+=    Description:
+=        Delete a user record given the UserID
+=
+=    UPDATES:
+=                                DateTime
+=    Author                        mm/dd/yyyy HH:mm    Description
+=    =====================        =============        =======================================================================================
+=
+=
+===========================================================================================================================================
+*/
+CREATE PROCEDURE [dbo].[usp_UserDelete]
+    @userID AS INTEGER
+AS
+SET XACT_ABORT, NOCOUNT ON
+DECLARE @starttrancount int
+BEGIN TRY
+    SELECT @starttrancount = @@TRANCOUNT
+
+    IF @starttrancount = 0
+        BEGIN TRANSACTION
+
+        -- if we can find a record for the userID pushed in, delete it.
+        -- if we don't find it - no matter, the user doesn't exist anyway and there's nothing to do
+        IF EXISTS(SELECT 1 FROM [dbo].[User] WHERE [UserID] = @userID)
+        BEGIN;
+            -- delete from UserPhone
+            DELETE FROM [dbo].[UserPhone]
+            WHERE
+                [UserID] = @userID
+
+            -- delete from UserAddress
+            DELETE FROM [dbo].[UserAddress]
+            WHERE
+                [UserID] = @userID
+
+            -- finally, delete from the user table
+            DELETE FROM [dbo].[User]
+            WHERE
+                [UserID] = @userID
+        END;
+
+    IF @starttrancount = 0 
+        COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 AND @starttrancount = 0 
+        ROLLBACK TRANSACTION;
+    THROW;
+END CATCH
+GO
 
 
 /************************************************************************
@@ -266,61 +459,56 @@ GO
 /************************************************************************
 *
 *
-*			BEGIN
+*			BEGIN Views
 *
 *
 ************************************************************************/
+USE [DaveTest_Complex]
+GO
 
+CREATE VIEW [dbo].[vUser]
+AS
+SELECT
+    u.[UserID]
+    ,u.[FirstName]
+    ,u.[LastName]
+    ,ua.[Address]
+    ,u.[Age]
+    ,up.[PhoneNumber]
+FROM
+    [dbo].[User] u
+        JOIN [dbo].[UserAddress] ua ON u.[UserID] = ua.[UserID]
+        JOIN [dbo].[UserPhone] up ON u.[UserID] = up.[UserID]
+    
 
 
 /************************************************************************
 *		#########################################################
 *			
-*			END 
-*			
-*		#########################################################
-************************************************************************/
-
-
-
-
-
-/************************************************************************
-*
-*
-*			BEGIN
-*
-*
-************************************************************************/
-
-
-
-/************************************************************************
-*		#########################################################
-*			
-*			END 
+*			END Views
 *			
 *		#########################################################
 ************************************************************************/
 
 
 
-
-
 /************************************************************************
 *
 *
-*			BEGIN
+*			BEGIN Sample Data Entry
 *
 *
 ************************************************************************/
-
-
-
+USE [DaveTest_Complex]
+GO
+exec [dbo].usp_UserUpsert 0, N'David', N'Lancellotti', N'2 Emerald Lane, Somewheresville, NJ 01010', N'87', N'1-800-123-1234'
+exec [dbo].usp_UserUpsert 0, N'Tod', N'Wilkinson', N'1 Happy Street, Middlington, TN 43435', N'45', N'1-201-565-6574'
+exec [dbo].usp_UserUpsert 0, N'Michelle', N'Aaronson', N'2 Emerald Lane, Elsingwhere, CA 43245', N'33', N'1-545-133-4178'
+exec [dbo].usp_UserUpsert 0, N'Hogarth', N'Hughes', N'27 Iron Giant Way, Woodsington, NY 94923', N'13', N'1-800-111-2222'
 /************************************************************************
 *		#########################################################
 *			
-*			END 
+*			END Sample Data Entry
 *			
 *		#########################################################
 ************************************************************************/

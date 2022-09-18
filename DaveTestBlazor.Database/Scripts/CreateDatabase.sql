@@ -148,9 +148,12 @@ CREATE LOGIN [DaveTestAccount] WITH PASSWORD=N'myTestAccount123'
 GO
 
 -- create the user in the application db and then tie it to the account created on the server
+-- also, add them to the appropriate roles
 USE [DaveTest]
 GO
 CREATE USER [DaveTestAccount] FOR LOGIN [DaveTestAccount] WITH DEFAULT_SCHEMA=[dbo]
+ALTER ROLE [db_datareader] add member [DaveTestAccount];
+ALTER ROLE [db_datawriter] add member [DaveTestAccount];
 GO
 
 /************************************************************************

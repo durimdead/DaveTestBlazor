@@ -64,7 +64,8 @@ else if (UserToEdit.UserID >= 0)
                     @if (currentUserID > 0)
                     {
                         // only show the "delete" button if we already have a userID
-                        <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
+                        // margin is a bit of a hack fix due to proximity to previous buttons - for the record: I hate this and would spend more time to not have it in prod code
+                        <button class="btn btn-danger" type="button" style="margin-left: 5px" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
                     }
                 </div>
             </div>

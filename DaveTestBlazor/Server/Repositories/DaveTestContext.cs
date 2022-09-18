@@ -35,7 +35,7 @@ namespace DaveTestBlazor.Server.Repositories
             parameters.Add(new SqlParameter("@userID", userID));
 
             // execute sproc
-            this.Database.ExecuteSqlRaw("exec usp_UserDelete @userID");
+            this.Database.ExecuteSqlRaw("exec usp_UserDelete @userID", parameters);
         }
     }
 }

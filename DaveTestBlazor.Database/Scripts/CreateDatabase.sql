@@ -154,6 +154,9 @@ GO
 CREATE USER [DaveTestAccount] FOR LOGIN [DaveTestAccount] WITH DEFAULT_SCHEMA=[dbo]
 ALTER ROLE [db_datareader] add member [DaveTestAccount];
 ALTER ROLE [db_datawriter] add member [DaveTestAccount];
+
+-- grant execute permissions for Sprocs
+GRANT EXECUTE TO [DaveTestAccount]
 GO
 
 /************************************************************************

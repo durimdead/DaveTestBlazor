@@ -28,5 +28,12 @@ namespace DaveTestBlazor.Server.Services.Interfaces
         /// </summary>
         /// <returns>A list of all currently active users.</returns>
         public IEnumerable<User> GetAllUsers();
+
+        /// <summary>
+        /// Gets a user based on their ID
+        /// </summary>
+        /// <param name="userID">the ID of the user</param>
+        /// <returns>the user for the given ID - default user object if the user is not found</returns>
+        public User GetUserByID(int userID);
     }
 }

@@ -5,9 +5,32 @@
 <PageTitle>User Listing</PageTitle>
 <h2>User Listing</h2>
 
-@if (Users == null)
+@if (Users == null && UserToEdit.UserID == 0)
 {
     <p><em>Loading...</em></p>
+}
+else if (UserToEdit.UserID > 0)
+{
+    var currentUserID = UserToEdit.UserID;
+    <div class="container-lg container-md container-sm">
+        <div class="row">
+            <div class="col-12">
+                <input type="text" placeholder="Name" value="@UserToEdit.FirstName">
+                <input type="text" placeholder="Name" value="@UserToEdit.LastName">
+                <input type="text" placeholder="Name" value="@UserToEdit.Address">
+                <input type="text" placeholder="Name" value="@UserToEdit.Age">
+                <input type="text" placeholder="Name" value="@UserToEdit.PhoneNumber">
+                <input type="hidden" value="@UserToEdit.UserID">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-success" type="button">Save</button>
+                <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
+                <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
+            </div>
+        </div>
+    </div>
 }
 else
 {
@@ -23,9 +46,10 @@ else
         <tbody>
             @foreach (var user in Users)
             {
+                var currentUserID = user.UserID;
                 <tr>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary" data-userid="@user.UserID" onclick="console.log('clicked user : @user.UserID')">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(e => GetUserToEdit(currentUserID))">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
                             </svg>&nbsp;&nbsp;@user.FirstName @user.LastName
@@ -40,25 +64,18 @@ else
     </table>
 }
 
-@*<Modal @ref="modal" Title="Modal title">
-    <BodyTemplate>
-        Modal body text goes here.
-    </BodyTemplate>
-    <FooterTemplate>
-        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
-        <Button Color="ButtonColor.Primary">Save changes</Button>
-    </FooterTemplate>
-</Modal>*@
-
 @code {
     private List<User> Users;
     private User UserToEdit = new User();
 
+    // show the latest data for the entire user listing
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // grab the data for the users from the controller
             Users = await Http.GetFromJsonAsync<List<User>>("api/User");
+            UserToEdit = new User();
         }
         catch (Exception e)
         {
@@ -67,17 +84,51 @@ else
         }
     }
 
-    private async Task GetUserToEdit(int userID){
-        UserToEdit = await Http.GetFromJsonAsync<User>("api/User/" + userID);
+    // get the user to edit
+    private async Task GetUserToEdit(int userID)
+    {
+        try
+        {
+            UserToEdit = await Http.GetFromJsonAsync<User>("api/User/" + userID);
+            Users = null;
+        }
+        catch (Exception e)
+        {
+            // is this perfect? no; however, letting the application swallow your errors is worse.
+            Console.Write(e.Message);
+        }
     }
 
-//    private Modal modal;
-//    private async Task OnShowModalClick()
-//    {
-//        await modal?.ShowAsync();
-//    }
-//    private async Task OnHideModalClick()
-//    {
-//        await modal?.HideAsync();
-//    }
+    // delete the user
+    private async Task DeleteUser(int userID)
+    {
+        try
+        {
+            // delete the user
+            await Http.DeleteAsync("api/User/" + userID);
+            // grab the data for the users from the controller
+            Users = await Http.GetFromJsonAsync<List<User>>("api/User");
+            UserToEdit = new User();
+        }
+        catch (Exception e)
+        {
+            // is this perfect? no; however, letting the application swallow your errors is worse.
+            Console.Write(e.Message);
+        }
+    }
+
+    //private async Task GetAllUsers(){
+    //    try
+    //    {
+    //        // grab the data for the users from the controller
+    //        Users = await Http.GetFromJsonAsync<List<User>>("api/User");
+    //        UserToEdit = new User();
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        // is this perfect? no; however, letting the application swallow your errors is worse.
+    //        Console.Write(e.Message);
+    //    }
+    //}
+
 }

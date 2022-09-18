@@ -30,10 +30,10 @@ namespace DaveTestBlazor.Server.Controllers
         }
 
         // GET api/<UserListingController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{userID}")]
+        public User Get(int userID)
         {
-            return "value";
+            return _userService.GetUserByID(userID);
         }
 
         // POST api/<UserListingController>
@@ -49,9 +49,10 @@ namespace DaveTestBlazor.Server.Controllers
         }
 
         // DELETE api/<UserListingController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{userid}")]
+        public void Delete(int userid)
         {
+            _userService.DeleteUser(userid);
         }
     }
 }

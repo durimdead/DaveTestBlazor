@@ -76,7 +76,7 @@ namespace DaveTestBlazor.Server.Services
             }
             catch (Exception e)
             {
-                //TODO: add logging to db table
+                // Not the best way to handle an error, but I did not make a logging mechanism in the database for this demo
                 Console.WriteLine(e.Message);
             }
             return returnValue;
@@ -101,7 +101,7 @@ namespace DaveTestBlazor.Server.Services
             }
             catch (Exception e)
             {
-                //TODO: add logging to db table
+                // Not the best way to handle an error, but I did not make a logging mechanism in the database for this demo
                 Console.WriteLine(e.Message);
             }
             return returnValue;

@@ -20,7 +20,7 @@ namespace DaveTestBlazor.Shared
 
         public User()
         {
-            // -1 to say "this is not a user, not is it trying to be"
+            // -1 to say "this is not a user, nor is it trying to be"
             this.UserID = -1;
             this.FirstName = String.Empty;
             this.LastName = String.Empty;

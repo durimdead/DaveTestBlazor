@@ -12,7 +12,8 @@
     {
         try
         {
-            Users = await Http.GetFromJsonAsync<User[]>("User");
+            var users = Http.GetFromJsonAsync<User[]>("api/UserListing");
+
         }
         catch (Exception e)
         {

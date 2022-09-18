@@ -1,7 +1,10 @@
-﻿namespace DaveTestBlazor.Server.Repositories.EF_Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DaveTestBlazor.Server.Repositories.EF_Models
 {
     public class vUser
     {
+        [Key]
         public int userID { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }

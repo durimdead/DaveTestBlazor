@@ -12,6 +12,59 @@
 else if (UserToEdit.UserID > 0)
 {
     var currentUserID = UserToEdit.UserID;
+    <EditForm Model=@UserToEdit>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="FirstName">First Name</label>
+                        <InputText @bind-Value=UserToEdit.FirstName class="form-control" id="FirstName" />
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="LastName">Last Name</label>
+                        <InputText @bind-Value=UserToEdit.LastName class="form-control" id="FirstName" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="Age">Age</label>
+                        <InputNumber @bind-Value=UserToEdit.Age class="form-control" id="Age" />
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="PhoneNumber">Phone Number</label>
+                        <InputText @bind-Value=UserToEdit.PhoneNumber class="form-control" id="PhoneNumber" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="Address">Address</label>
+                        <InputText @bind-Value=UserToEdit.Address class="form-control" id="Address" />
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-12">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
+                    <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
+                </div>
+            </div>
+        </div>
+        
+    </EditForm>
+
+
+
+   @* var currentUserID = UserToEdit.UserID;
     <div class="container-lg container-md container-sm">
         <div class="row">
             <div class="col-12">
@@ -25,12 +78,12 @@ else if (UserToEdit.UserID > 0)
         </div>
         <div class="row">
             <div class="col-12">
-                <button class="btn btn-success" type="button">Save</button>
+                <button class="btn btn-success" type="submit">Save</button>
                 <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
                 <button class="btn btn-danger" type="button" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
             </div>
         </div>
-    </div>
+    </div>*@
 }
 else
 {
@@ -115,6 +168,12 @@ else
             // is this perfect? no; however, letting the application swallow your errors is worse.
             Console.Write(e.Message);
         }
+    }
+
+    private async Task FormSubmitted(EditContext editContext)
+    {
+        Console.WriteLine("About to submit " + UserToEdit.UserID);
+        //await Http.PutAsJsonAsync<>("api/User");
     }
 
     //private async Task GetAllUsers(){

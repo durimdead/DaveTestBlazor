@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/userlisting"
 @using DaveTestBlazor.Shared
 @using DaveTestBlazor.Shared.Models
 @inject HttpClient Http
@@ -6,7 +6,7 @@
 <PageTitle>User Listing</PageTitle>
 <h2>User Listing</h2>
 
-@code{
+@code {
     private User[]? Users;
 
     protected override async Task OnInitializedAsync()

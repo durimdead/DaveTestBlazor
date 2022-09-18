@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaveTestBlazor.Server", "DaveTestBlazor\Server\DaveTestBlazor.Server.csproj", "{3EB707EF-E38D-41E8-8BB6-DE1B5B85B93D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaveTestBlazor.Server", "DaveTestBlazor\Server\DaveTestBlazor.Server.csproj", "{3EB707EF-E38D-41E8-8BB6-DE1B5B85B93D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaveTestBlazor.Client", "DaveTestBlazor\Client\DaveTestBlazor.Client.csproj", "{929C6CD2-2502-4177-95A6-D1670F335CFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaveTestBlazor.Client", "DaveTestBlazor\Client\DaveTestBlazor.Client.csproj", "{929C6CD2-2502-4177-95A6-D1670F335CFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaveTestBlazor.Shared", "DaveTestBlazor\Shared\DaveTestBlazor.Shared.csproj", "{C1CC4F5C-357E-4AE1-B771-4F016EF9BA4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaveTestBlazor.Shared", "DaveTestBlazor\Shared\DaveTestBlazor.Shared.csproj", "{C1CC4F5C-357E-4AE1-B771-4F016EF9BA4C}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DaveTestBlazor.Database", "DaveTestBlazor.Database\DaveTestBlazor.Database.sqlproj", "{12C314CC-1956-45DA-AC95-A11C9FF0B2DA}"
 EndProject

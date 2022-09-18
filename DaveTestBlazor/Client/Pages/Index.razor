@@ -12,7 +12,7 @@
 else if (UserToEdit.UserID > 0)
 {
     var currentUserID = UserToEdit.UserID;
-    <EditForm Model=@UserToEdit>
+    <EditForm Model=@UserToEdit OnSubmit="(e => FormSubmitted(UserToEdit))">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-3">
@@ -170,10 +170,10 @@ else
         }
     }
 
-    private async Task FormSubmitted(EditContext editContext)
+    private async Task FormSubmitted(User UserToSubmit)
     {
         Console.WriteLine("About to submit " + UserToEdit.UserID);
-        //await Http.PutAsJsonAsync<>("api/User");
+        var result = await Http.PostAsJsonAsync("api/User", UserToSubmit);
     }
 
     //private async Task GetAllUsers(){

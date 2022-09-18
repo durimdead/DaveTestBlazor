@@ -38,8 +38,9 @@ namespace DaveTestBlazor.Server.Controllers
 
         // POST api/<UserListingController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody]User userToSave)
         {
+            Console.WriteLine("In Here");
         }
 
         // PUT api/<UserListingController>/5

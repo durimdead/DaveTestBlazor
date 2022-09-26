@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DaveTestBlazor.Server.Repositories
 {
+    /// <summary>
+    /// I should have had the summary tags on this class, and would be nice to have some error handling in here.
+    /// </summary>
     public class DaveTestContext : DbContext
     {
         public DaveTestContext(DbContextOptions options) : base(options)
@@ -15,7 +18,6 @@ namespace DaveTestBlazor.Server.Repositories
 
         public void usp_UserUpsert(string firstName, string lastName, string address, string phoneNumber, int age, int userID = 0)
         {
-            // parameterize the data for executing the stored procedure
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@userFirstName", firstName));
             parameters.Add(new SqlParameter("@userLastName", lastName));
@@ -24,17 +26,14 @@ namespace DaveTestBlazor.Server.Repositories
             parameters.Add(new SqlParameter("@userAge", age));
             parameters.Add(new SqlParameter("@userID", userID));
 
-            // execute sproc
             this.Database.ExecuteSqlRaw("exec usp_UserUpsert @userID, @userFirstName, @userLastName, @userAddress, @userAge, @userPhoneNumber", parameters);
         }
 
         public void usp_UserDelete(int userID)
         {
-            // parameterize the data for executing the stored procedure
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@userID", userID));
 
-            // execute sproc
             this.Database.ExecuteSqlRaw("exec usp_UserDelete @userID", parameters);
         }
     }

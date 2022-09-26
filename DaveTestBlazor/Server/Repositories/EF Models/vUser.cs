@@ -2,6 +2,9 @@
 
 namespace DaveTestBlazor.Server.Repositories.EF_Models
 {
+    /// <summary>
+    /// Overall, nothing to change here. This is just used to grab information from the database.
+    /// </summary>
     public class vUser
     {
         [Key]

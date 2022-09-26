@@ -1,4 +1,28 @@
-﻿@page "/"
+﻿@******************************************************************************************************************************************************************
+
+Overall, this page was just to show that I could use blazor. That being said, it is very clear that the skill here is different from the rest of the application.
+Sadly, this is also what took me the longest to do.
+
+The problems were:
+    - The architecture was not good (everything in one page, no partial views)
+    - Modal would have been nicer for the edit / create to be within a modal (depends on preference, though)
+    - no validation of the form
+    - no good expandability/adaptability of the code base.
+    - Basically utilized "states" of variables to decide some potentially hard-coded things to show.
+    - Attempted to (but couldn't get to work) utilize re-usable code to "GetAllUsers".
+    - Utilized -1 for userID when 0 should have been fine.
+    - minor issues with delete button (however, it was noted that it would be handled a different way if it was to be a production-ready system)
+
+What worked :
+    - The code worked
+    - It was documented that no validation was utilized, nor was it within the requirements.
+    - Added ability to create user since this is most likely a desired functionality
+    - Handled changing of labels, etc (which should have just loaded different partials, sure)
+
+*******************************************************************************************************************************************************************@
+
+
+@page "/"
 @using DaveTestBlazor.Shared
 @inject HttpClient Http
 
@@ -18,13 +42,11 @@ else
 
 
 @if (Users != null){
-    // this means that we at least have an empty list - something was loaded. Show the "create user" button
     <button class="btn btn-success" type="button" @onclick="@(e => GetUserToEdit(0))">Create User</button>
 }
 
 @if (Users == null && UserToEdit.UserID < 0)
 {
-    // both objects are null, something is loading!
     <p><em>Loading...</em></p>
 }
 else if (UserToEdit.UserID >= 0)
@@ -75,8 +97,6 @@ else if (UserToEdit.UserID >= 0)
                     <button class="btn btn-secondary" type="button" @onclick="OnInitializedAsync">Cancel</button>
                     @if (currentUserID > 0)
                     {
-                        // only show the "delete" button if we already have a userID
-                        // margin is a bit of a hack fix due to proximity to previous buttons - for the record: I hate this and would spend more time to not have it in prod code
                         <button class="btn btn-danger" type="button" style="margin-left: 5px" @onclick="@(e => DeleteUser(currentUserID))">Delete</button>
                     }
                 </div>
@@ -87,7 +107,6 @@ else if (UserToEdit.UserID >= 0)
 }
 else if (Users.Count() > 0)
 {
-    // we have at least one user - show the table
     <table class="table">
         <thead>
             <tr>
@@ -126,23 +145,19 @@ else if (Users.Count() == 0)
     private List<User> Users;
     private User UserToEdit = new User();
 
-    // show the latest data for the entire user listing
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            // grab the data for the users from the controller
             Users = await Http.GetFromJsonAsync<List<User>>("api/User");
             UserToEdit = new User();
         }
         catch (Exception e)
         {
-            // is this perfect? no; however, letting the application swallow your errors is worse.
             Console.Write(e.Message);
         }
     }
 
-    // get the user to edit
     private async Task GetUserToEdit(int userID)
     {
         try
@@ -152,30 +167,24 @@ else if (Users.Count() == 0)
         }
         catch (Exception e)
         {
-            // is this perfect? no; however, letting the application swallow your errors is worse.
             Console.Write(e.Message);
         }
     }
 
-    // delete the user
     private async Task DeleteUser(int userID)
     {
         try
         {
-            // delete the user
             await Http.DeleteAsync("api/User/" + userID);
-            // grab the data for the users from the controller
             Users = await Http.GetFromJsonAsync<List<User>>("api/User");
             UserToEdit = new User();
         }
         catch (Exception e)
         {
-            // is this perfect? no; however, letting the application swallow your errors is worse.
             Console.Write(e.Message);
         }
     }
 
-    // form submit for new user / user update
     private async Task FormSubmitted(User UserToSubmit)
     {
         Console.WriteLine("About to submit " + UserToEdit.UserID);

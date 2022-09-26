@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace DaveTestBlazor.Shared
 {
+    /// <summary>
+    /// Annotations utilizing regex for validation for the model would have been better.
+    /// Additionally, it would have been better to have a more well thought out way to handle a "new" user.
+    /// Biggest reason I did it as I did was due to the way I handled the front-end (which was not elegant)
+    /// </summary>
     public class User
     {
         public User(int userID, string firstName, string lastName, string address, string phoneNumber, int age)
@@ -20,7 +25,6 @@ namespace DaveTestBlazor.Shared
 
         public User()
         {
-            // -1 to say "this is not a user, nor is it trying to be"
             this.UserID = -1;
             this.FirstName = String.Empty;
             this.LastName = String.Empty;
